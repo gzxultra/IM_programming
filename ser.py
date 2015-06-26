@@ -108,6 +108,11 @@ class ServerUI():
                 theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 self.chatText.insert(Tkinter.END, theTime +' 客户端 ' +s[3] +' 对 客户端 ' + s[1] +' 说：\n')
                 self.chatText.insert(Tkinter.END, '  ' + s[2]+str(each[1]))
+            elif s[0]=='2':
+                self.usr_online= filter(lambda x:x !=[s[1],self.addr],self.usr_online)
+                for each in self.usr_online:
+                    self.udpSerSock.sendto('3##'+s[1],each[1])
+                
     
     #发送消息
     def sendMessage(self):
