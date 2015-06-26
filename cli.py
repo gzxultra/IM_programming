@@ -8,6 +8,8 @@ import socket
 import thread
 import time
 import sys
+import codecs
+
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
@@ -18,11 +20,13 @@ class ClientUI():
     local = '127.0.0.1'
     port = 8808
     global udpCliSock 
+    buffer = 1024
     flag = False
     ADDR=(local,port)
     usr='12073128'
     pwd='12073128'
     toUsr='12073127'
+    
     #初始化类的相关属性，类似于Java的构造方法
     def __init__(self):
         self.root = Tkinter.Tk()
@@ -63,7 +67,9 @@ class ClientUI():
         #发送消息按钮
         self.sendButton=Tkinter.Button(self.frame[3],text=' 发 送 ',width=10,command=self.sendMessage)
         self.sendButton.pack(expand=1,side=Tkinter.BOTTOM and Tkinter.RIGHT,padx=15,pady=8)
-
+        #传文件按钮
+        self.sendButton=Tkinter.Button(self.frame[3],text=' 传文件 ',width=10,command=self.sendFile)
+        self.sendButton.pack(expand=1,side=Tkinter.BOTTOM and Tkinter.RIGHT,padx=15,pady=8)
         #关闭按钮
         self.closeButton=Tkinter.Button(self.frame[3],text=' 关 闭 ',width=10,command=self.close)
         self.closeButton.pack(expand=1,side=Tkinter.RIGHT,padx=15,pady=8)
@@ -80,7 +86,7 @@ class ClientUI():
             self.chatText.insert(Tkinter.END,'您还未与服务器端建立连接，请检查服务器端是否已经启动')
             return
        
-        self.buffer = 1024
+        
         self.udpCliSock.sendto('0##'+self.usr+'##'+self.pwd,self.ADDR)
         while True:
             try:
@@ -99,9 +105,15 @@ class ClientUI():
                         theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                         self.chatText.insert(Tkinter.END,  theTime +' '+s[1] +' 说：\n')
                         self.chatText.insert(Tkinter.END, '  ' + s[2])
-                    elif s[0]=='3':
+                    elif s[0]=='2':
                         theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                        self.chatText.insert(Tkinter.END, theTime+' ' +'你的好友' + s[1]+'下线了')                        
+                        self.chatText.insert(Tkinter.END, theTime+' ' +'你的好友' + s[1]+'下线了')    
+                    elif s[0]=='3':
+                        filename=s[1]
+                        fp = open(unicode('..\\'+self.usr+'\\'+filename[:-1] , "utf8"),'w')
+                        fp.write(s[2])
+                        fp.close()      
+                        self.chatText.insert(Tkinter.END,filename[:-1]+' 传输完成')           
                 else:
                     break
             except EOFError, msg:
@@ -125,7 +137,19 @@ class ClientUI():
             self.chatText.insert(Tkinter.END,'您还未与服务器端建立连接，服务器端无法收到您的消息\n')
         #清空用户在Text中输入的消息
         self.inputText.delete(0.0,message.__len__()-1.0)
-    
+        
+    #传文件
+    def sendFile(self):
+        filename = self.inputText.get('1.0',Tkinter.END)
+        theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        self.chatText.insert(Tkinter.END, theTime +'我' + ' 传文件：\n')
+        self.chatText.insert(Tkinter.END,'  ' + filename[:-1] + '\n')
+        fp = open('..\\'+self.usr+'\\'+filename[:-1],'r')
+        filedata = fp.read(self.buffer)
+       
+        filedata =unicode(filedata,"utf8")
+        self.udpCliSock.sendto('3##'+self.toUsr+'##'+self.usr+'##'+filename+'##'+filedata,self.ADDR);
+        fp.close()
     #关闭消息窗口并退出
     def close(self):
         self.udpCliSock.sendto('2##'+self.usr,self.ADDR);
