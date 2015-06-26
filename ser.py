@@ -64,6 +64,8 @@ class ServerUI():
         #发送消息按钮
         self.sendButton=Tkinter.Button(self.frame[3],text=' 发 送 ',width=10,command=self.sendMessage)
         self.sendButton.pack(expand=1,side=Tkinter.BOTTOM and Tkinter.RIGHT,padx=25,pady=5)
+        
+
 
         #关闭按钮
         self.closeButton=Tkinter.Button(self.frame[3],text=' 关 闭 ',width=10,command=self.close)
@@ -86,6 +88,7 @@ class ServerUI():
             if s[0]=='0':
                 fobj=open('usr&pwd.txt','r')
                 for eachLine in fobj:
+                    
                     if eachLine.split(' ')[0]==s[1] and eachLine.split(' ')[1]==s[2]:
                         self.chatText.insert(Tkinter.END,'服务器端已经与客户端建立连接......'+str(self.addr))
                         #发送好友上线信息
@@ -111,8 +114,15 @@ class ServerUI():
             elif s[0]=='2':
                 self.usr_online= filter(lambda x:x !=[s[1],self.addr],self.usr_online)
                 for each in self.usr_online:
-                    self.udpSerSock.sendto('3##'+s[1],each[1])
+                    self.udpSerSock.sendto('2##'+s[1],each[1])
+            elif s[0]=='3':
+                    for each in self.usr_online:
+                        if s[1]==each[0]:
+                            self.udpSerSock.sendto('3##'+'from'+s[2]+'_'+s[3]+'##'+s[4],each[1])
+                            break
+                    
                 
+                    
     
     #发送消息
     def sendMessage(self):
