@@ -8,7 +8,7 @@ import socket
 import thread
 import time
 import sys
-import codecs
+
 
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
