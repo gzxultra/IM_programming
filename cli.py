@@ -20,9 +20,9 @@ class ClientUI():
     global udpCliSock 
     flag = False
     ADDR=(local,port)
-    usr='12073128'
-    pwd='12073128'
-    toUsr='12073127'
+    usr='12073127'
+    pwd='12073127'
+    toUsr='12073128'
     #初始化类的相关属性，类似于Java的构造方法
     def __init__(self):
         self.root = Tkinter.Tk()
@@ -93,11 +93,15 @@ class ClientUI():
                     elif s[0]== 'N':
                         self.chatText.insert(Tkinter.END,'客户端与服务器端建立连接失败......')
                     elif s[0]=='0':
-                        self.chatText.insert(Tkinter.END, '你的好友' + s[1]+'上线了')
+                        theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                        self.chatText.insert(Tkinter.END, theTime+' ' +'你的好友' + s[1]+'上线了')
                     elif s[0]=='1':
                         theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                        self.chatText.insert(Tkinter.END,  theTime +s[1] +' 说：\n')
+                        self.chatText.insert(Tkinter.END,  theTime +' '+s[1] +' 说：\n')
                         self.chatText.insert(Tkinter.END, '  ' + s[2])
+                    elif s[0]=='3':
+                        theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                        self.chatText.insert(Tkinter.END, theTime+' ' +'你的好友' + s[1]+'下线了')                        
                 else:
                     break
             except EOFError, msg:
@@ -111,7 +115,7 @@ class ClientUI():
         message = self.inputText.get('1.0',Tkinter.END)
         #格式化当前的时间
         theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        self.chatText.insert(Tkinter.END, '客户端器 ' + theTime +' 说：\n')
+        self.chatText.insert(Tkinter.END, theTime +'我' + ' 说：\n')
         self.chatText.insert(Tkinter.END,'  ' + message + '\n')
         if self.flag == True:
             #将消息发送到服务器端
@@ -124,6 +128,7 @@ class ClientUI():
     
     #关闭消息窗口并退出
     def close(self):
+        self.udpCliSock.sendto('2##'+self.toUsr,self.ADDR);
         sys.exit()
     
     #启动线程接收服务器端的消息
