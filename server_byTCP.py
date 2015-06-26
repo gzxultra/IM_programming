@@ -3,6 +3,7 @@ import sys
 import argparse
 
 host = 'localhost'
+port = 8899
 data_payload = 2048
 backlog = 5
 
@@ -16,7 +17,7 @@ def echo_server(port):
 	server_address = (host, port)
 	print "Starting up echo server on %s port %s" % server_address
 	sock.bind(server_address)
-	# Listen to the clients, backlog argument specifies the max no. of 
+	# Listen to the clients, backlog argument specifies the max no. of
 	# connections
 	sock.listen(backlog)
 	while True:
@@ -28,11 +29,12 @@ def echo_server(port):
 			client.send(data)
 			print "sent %s bytes back to %s" % (data, address)
 		# end connection
-		# client.close()
+		client.close()
+
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(description = 'Socket Server Example')
-	parser.add_argument('--port', action = 'store', dest = 'port', type = int, required = True)
-	given_args = parser.parse_args()
-	port = given_args.port
+	#parser = argparse.ArgumentParser(description = 'Socket Server Example')
+	#parser.add_argument('--port', action = 'store', dest = 'port', type = int, required = True)
+	#given_args = parser.parse_args()
+	#port = given_args.port
 	echo_server(port)
