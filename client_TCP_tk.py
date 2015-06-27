@@ -83,6 +83,7 @@ class ClientUI():
 
         self.buffer = 1024
         self.tcpCliSock.send('0##'+self.usr+'##'+self.pwd)
+        self.chatText.insert(Tkinter.END,'正在登陆...')
         while True:
             try:
                 if self.flag == True:
@@ -139,6 +140,8 @@ class ClientUI():
         #其中function参数是将要调用的线程函数，args是传递给线程函数的参数，它必须是个元组类型，而kwargs是可选的参数
         #receiveMessage函数不需要参数，就传一个空元组
         thread.start_new_thread(self.receiveMessage,())
+
+
 
 def main():
     client = ClientUI()
