@@ -71,21 +71,24 @@ class ServerUI():
     def receiveMessage(self):
         self.usr_online = []
         #建立Socket连接
-        self.tcpSerSock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        self.tcpSerSock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.tcpSerSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.tcpSerSock.bind(self.ADDR)
         self.tcpSerSock.listen(15)
         self.buffer = 1024
         self.chatText.insert(Tkinter.END,'服务器已经就绪......')
 
+        self.startNewThread()
+
         #循环接受客户端的连接请求
         while True:
             mark = 0
-            self.connection,self.addr = self.tcpSerSock.accept()
+            self.tcpSerSock,self.addr = self.tcpSerSock.accept()
             self.flag = True
+
             while True:
                 #接收客户端发送的消息
-                self.clientMsg = self.connection.recv(self.buffer)
+                self.clientMsg = self.tcpSerSock.recv(self.buffer)
                 if not self.clientMsg:
                     continue
                 s=self.clientMsg.split('##')
@@ -96,20 +99,20 @@ class ServerUI():
                             self.chatText.insert(Tkinter.END,'服务器端已经与客户端建立连接......'+str(self.addr))
                             #发送好友上线信息
                             for each in self.usr_online:
-                                self.tcpSerSock.sendto('0##'+s[1],each[1])
-                            mark=1
+                                self.tcpSerSock.send('0##'+s[1])
+                            mark = 1
                             #添加到上线用户列表
                             self.usr_online.append([s[1],self.addr])
-                            self.tcpSerSock.sendto('Y',self.addr)
+                            self.tcpSerSock.send('Y')
                             break
                     fobj.close()
                     if mark==0:
                         self.chatText.insert(Tkinter.END,'服务器端与客户端建立连接失败......')
-                        self.tcpSerSock.sendto('N',self.addr)
+                        self.tcpSerSock.send('N',self)
                 elif s[0]=='1':
                     for each in self.usr_online:
-                        if s[1]==each[0]:
-                            self.tcpSerSock.sendto('1##'+s[3]+'##'+s[2],each[1])
+                        if s[1] == each[0]:
+                            self.tcpSerSock.send('1##'+s[3]+'##'+s[2])
                             break
                     theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                     self.chatText.insert(Tkinter.END, theTime +' 客户端 ' +s[3] +' 对 客户端 ' + s[1] +' 说：\n')
@@ -117,7 +120,7 @@ class ServerUI():
                 elif s[0]=='2':
                     self.usr_online= filter(lambda x:x !=[s[1],self.addr],self.usr_online)
                     for each in self.usr_online:
-                        self.tcpSerSock.sendto('3##'+s[1],each[1])
+                        self.tcpSerSock('3##'+s[1])
 
     #发送消息
     def sendMessage(self):
@@ -129,7 +132,7 @@ class ServerUI():
         self.chatText.insert(Tkinter.END,'  ' + message + '\n'+str(self.addr))
 
             #将消息发送到客户端
-        self.tcpSerSock.sendto(message,self.addr)
+        self.tcpSerSock.send(message)
 
         #清空用户在Text中输入的消息
         self.inputText.delete(0.0,message.__len__()-1.0)

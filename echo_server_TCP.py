@@ -17,7 +17,7 @@ def echo_server(port):
 	server_address = (host, port)
 	print "Starting up echo server on %s port %s" % server_address
 	sock.bind(server_address)
-	# Listen to the clients, backlog argument specifies the max no. of 
+	# Listen to the clients, backlog argument specifies the max no. of
 	# connections
 	sock.listen(backlog)
 	while True:

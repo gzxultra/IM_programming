@@ -20,9 +20,9 @@ class ClientUI():
     global tcpCliSock
     flag = False
     ADDR=(local,port)
-    usr='12073127'
-    pwd='12073127'
-    toUsr='12073128'
+    usr='12073128'
+    pwd='12073128'
+    toUsr='12073127'
     #初始化类的相关属性，类似于Java的构造方法
     def __init__(self):
         self.root = Tkinter.Tk()
@@ -82,7 +82,7 @@ class ClientUI():
             return
 
         self.buffer = 1024
-        self.tcpCliSock.sendto('0##'+self.usr+'##'+self.pwd,self.ADDR)
+        self.tcpCliSock.send('0##'+self.usr+'##'+self.pwd)
         while True:
             try:
                 if self.flag == True:
@@ -120,7 +120,7 @@ class ClientUI():
         self.chatText.insert(Tkinter.END,'  ' + message + '\n')
         if self.flag == True:
             #将消息发送到服务器端
-            self.tcpCliSock.sendto('1##'+self.toUsr+'##'+message+'##'+self.usr,self.ADDR);
+            self.tcpCliSock.send('1##'+self.toUsr+'##'+message+'##'+self.usr)
         else:
             #Socket连接没有建立，提示用户
             self.chatText.insert(Tkinter.END,'您还未与服务器端建立连接，服务器端无法收到您的消息\n')
@@ -129,7 +129,7 @@ class ClientUI():
 
     #关闭消息窗口并退出
     def close(self):
-        self.tcpCliSock.sendto('2##'+self.usr,self.ADDR);
+        self.tcpCliSock.send('2##'+self.usr)
         sys.exit()
 
     #启动线程接收服务器端的消息
