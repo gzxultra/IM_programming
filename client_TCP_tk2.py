@@ -20,9 +20,9 @@ class ClientUI():
     global tcpCliSock
     flag = False
     ADDR=(local,port)
-    usr='12073128'
-    pwd='12073128'
-    toUsr='12073127'
+    usr='12073127'
+    pwd='12073127'
+    toUsr='12073128'
     #初始化类的相关属性，类似于Java的构造方法
     def __init__(self):
         self.root = Tkinter.Tk()

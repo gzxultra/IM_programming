@@ -125,7 +125,7 @@ class ServerUI():
         self.chatText.insert(Tkinter.END,'  ' + message + '\n'+str(self.addr))
 
             #将消息发送到客户端
-        self.udpSerSock.sendto(message,self.addr)
+        self.tcpSerSock.send(message)
 
         #清空用户在Text中输入的消息
         self.inputText.delete(0.0,message.__len__()-1.0)

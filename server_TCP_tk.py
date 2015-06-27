@@ -107,44 +107,62 @@ class ServerUI():
 
 
 
-
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         self.usr_online = []
-        clientMsg = self.request.recv(1024)
+        while True:
+            clientMsg = self.request.recv(1024)
 
-        s = clientMsg.split('##')
+            s = clientMsg.split('##')
+            filename = ''
 
-        if s[0]=='0':
-            fobj=open('usr&pwd.txt','r')
-            for eachLine in fobj:
-                if eachLine.split(' ')[0]==s[1] and eachLine.split(' ')[1]==s[2]:
-                    serverUI.chatText.insert(Tkinter.END,'服务器端已经与客户端建立连接......',self.client_address)
-                    #发送好友上线信息
-                    for each in self.usr_online:
-                        self.request.send('0##'+s[1])
+            if s[0]=='0':
+                fobj=open('usr&pwd.txt','r')
+                for eachLine in fobj:
+                    if eachLine.split(' ')[0]==s[1] and eachLine.split(' ')[1]==s[2]:
+                        serverUI.chatText.insert(Tkinter.END,'服务器端已经与客户端建立连接......'+str(self.client_address))
 
-                    mark = 1
-                    #添加到上线用户列表
-                    self.usr_online.append([s[1],self.client_address])
-                    self.request.send('Y')
-                    break
-            fobj.close()
-            if mark==0:
-                serverUI.chatText.insert(Tkinter.END,'服务器端与客户端建立连接失败......')
-                self.request.send('N',self)
-        elif s[0]=='1':
-            for each in self.usr_online:
-                if s[1] == each[0]:
-                    self.request.send('1##'+s[3]+'##'+s[2])
-                    break
-            theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            serverUI.chatText.insert(Tkinter.END, theTime +' 客户端 ' +s[3] +' 对 客户端 ' + s[1] +' 说：\n')
-            serverUI.chatText.insert(Tkinter.END, '  ' + s[2]+str(each[1]))
-        elif s[0]=='2':
-            self.usr_online= filter(lambda x:x !=[s[1],self.addr],self.usr_online)
-            for each in self.usr_online:
-                self.request('3##'+s[1])
+                        #发送好友上线信息
+                        for each in self.usr_online:
+                            self.request.send('0##'+s[1])
+
+                        mark = 1
+                        #添加到上线用户列表
+                        self.usr_online.append([s[1],self.client_address])
+                        self.request.send('Y')
+                        break
+                fobj.close()
+                if mark==0:
+                    serverUI.chatText.insert(Tkinter.END,'服务器端与客户端建立连接失败......')
+                    self.request.send('N',self)
+            elif s[0]=='1':
+                for each in self.usr_online:
+                    if s[1] == each[0]:
+                        self.request.send('1##'+s[3]+'##'+s[2])
+                        break
+                theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                serverUI.chatText.insert(Tkinter.END, theTime +' 客户端 ' + s[3] +' 对 客户端 ' + s[1] +' 说：\n')
+                serverUI.chatText.insert(Tkinter.END, '  ' + s[2]+str(each[1]))
+
+                read_filename = s[1] +'-' + s[3] +'.txt'
+                if os.path.exists('/Users/gzxultra/IM_programming/'+filename):
+                    print "found it!"
+                    target = open(read_filename,'r')
+                    indata = target.read()
+                    print indata
+                    self.request.sendall(indata)
+                    #target.truncate()
+                    target.close()
+                else:
+                    pass
+                write_filename = s[3] +'-' + s[1] +'.txt'
+                target = open(read_filename,'a')
+                target.write(theTime +' 客户端 ' + s[3] +' 对 客户端 ' + s[1] +' 说：\n'+'  ' + s[2]+str(each[1]))
+
+            elif s[0]=='2':
+                self.usr_online= filter(lambda x:x !=[s[1],self.client_address],self.usr_online)
+                for each in self.usr_online:
+                    self.request('3##'+s[1])
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     pass
