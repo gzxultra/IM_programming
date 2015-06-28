@@ -145,7 +145,7 @@ class ClientUI():
         self.chatText.insert(Tkinter.END, theTime +'我' + ' 传文件：\n')
         self.chatText.insert(Tkinter.END,'  ' + filename[:-1] + '\n')
         f=FTP('192.168.1.105')
-        f.login('Coder', 'xianjian')
+        f.login('username', 'password')
         f.cwd(self.toUsr)
         filenameU=filename[:-1].encode("cp936")
         try:
