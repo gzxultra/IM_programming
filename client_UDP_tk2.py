@@ -17,9 +17,9 @@ reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
 class ClientUI():
-    usr='12073128'
-    pwd='12073128'
-    toUsr='12073127'
+    usr='12073127'
+    pwd='12073127'
+    toUsr='12073128'
 
     title = usr+'-to-'+toUsr+'  客户端'
 
