@@ -7,21 +7,16 @@
  *  Finished on: 2015年x月xx日
 
 ---
-### Install Dependencies
+提前装好pip（建议搜索）
 
-#### Linux (Debian/Ubuntu Linux)
-
-```$ sudo apt-get install python-imaging```
-#### Mac OS X
-
-Mac和其他版本的Linux可以直接使用easy_install或pip安装，安装前需要把编译环境装好：
-
-```$ sudo easy_install PIL``
-#### Windows`
-
-Windows平台去PIL官方网站下载exe安装包
-
-[PIL:http://www.pythonware.com/products/pil/](http://www.pythonware.com/products/pil/)
+getNews依赖Python第三方库feedparser,你可以执行下面的命令安装这个库
+``` 
+$ pip install feedparser
+'''
+或
+'''
+$ easy_install feedparser
+```
 
 ---
 
