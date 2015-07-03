@@ -2,39 +2,36 @@
 # Filename:ServerUI.py
 # Python在线聊天服务器端
 from socket import *
+import socket
 import Tkinter
 import tkFont
-import socket
 import thread
 import time
 import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
-class ServerUI():
-
-    title = '服务端'
-    local = '127.0.0.1'
-    port = 8808
-    global udpSerSock;
-    ADDR = (local,port)
-    global addr
-    global usr_online
-
-
-    usr_sum=0
-    #初始化类的相关属性，类似于Java的构造方法
-    def __init__(self):
+class ServerMessage():
+    #设置标题
+    def setTitle(self,title):
+        self.title=title
+    
+    #设置ip地址和端口号
+    def setLocalANDPort(self,local,port):
+        self.local = local
+        self.port = port
+        
+    def __init__(self,title):
         self.root = Tkinter.Tk()
-        self.root.title(self.title)
-
+        self.root.title(title)
+        
         #窗口面板,用4个frame面板布局
         self.frame = [Tkinter.Frame(),Tkinter.Frame(),Tkinter.Frame(),Tkinter.Frame()]
 
         #显示消息Text右边的滚动条
         self.chatTextScrollBar = Tkinter.Scrollbar(self.frame[0])
         self.chatTextScrollBar.pack(side=Tkinter.RIGHT,fill=Tkinter.Y)
-
+        
         #显示消息Text，并绑定上面的滚动条
         ft = tkFont.Font(family='Fixdsys',size=11)
         self.chatText = Tkinter.Listbox(self.frame[0],width=70,height=18,font=ft)
@@ -42,16 +39,16 @@ class ServerUI():
         self.chatText.pack(expand=1,fill=Tkinter.BOTH)
         self.chatTextScrollBar['command'] = self.chatText.yview()
         self.frame[0].pack(expand=1,fill=Tkinter.BOTH)
-
+        
         #标签，分开消息显示Text和消息输入Text
         label = Tkinter.Label(self.frame[1],height=2)
         label.pack(fill=Tkinter.BOTH)
         self.frame[1].pack(expand=1,fill=Tkinter.BOTH)
-
+        
         #输入消息Text的滚动条
         self.inputTextScrollBar = Tkinter.Scrollbar(self.frame[2])
         self.inputTextScrollBar.pack(side=Tkinter.RIGHT,fill=Tkinter.Y)
-
+        
         #输入消息Text，并与滚动条绑定
         ft = tkFont.Font(family='Fixdsys',size=11)
         self.inputText = Tkinter.Text(self.frame[2],width=70,height=8,font=ft)
@@ -59,28 +56,30 @@ class ServerUI():
         self.inputText.pack(expand=1,fill=Tkinter.BOTH)
         self.inputTextScrollBar['command'] = self.chatText.yview()
         self.frame[2].pack(expand=1,fill=Tkinter.BOTH)
-
+        
         #发送消息按钮
         self.sendButton=Tkinter.Button(self.frame[3],text=' 发 送 ',width=10,command=self.sendMessage)
         self.sendButton.pack(expand=1,side=Tkinter.BOTTOM and Tkinter.RIGHT,padx=25,pady=5)
-
+        
 
 
         #关闭按钮
         self.closeButton=Tkinter.Button(self.frame[3],text=' 关 闭 ',width=10,command=self.close)
         self.closeButton.pack(expand=1,side=Tkinter.RIGHT,padx=25,pady=5)
         self.frame[3].pack(expand=1,fill=Tkinter.BOTH)
-
+        
     #接收消息
     def receiveMessage(self):
+        self.usr_sum=0
         self.usr_online = []
+        self.ADDR = (self.local,self.port)
         #建立Socket连接
         self.udpSerSock = socket.socket(AF_INET, SOCK_DGRAM)
         self.udpSerSock.bind(self.ADDR)
         self.buffer = 1024
         self.chatText.insert(Tkinter.END,'服务器已经就绪......')
         #循环接受客户端的连接请求
-
+        
         while True:
             mark=0
             isOnline=0
@@ -93,7 +92,7 @@ class ServerUI():
                     if eachLine.split(' ')[0]==s[1] and eachLine.split(' ')[1]==s[2]:
                         self.chatText.insert(Tkinter.END,'服务器端已经与客户端建立连接......'+str(self.addr))
                         self.udpSerSock.sendto('Y',self.addr)
-
+                        
                         #检查是否已登录，将原登陆客户端退出并抹去在线用户列表中的
                         for each in self.usr_online:
                             if s[1]==each[0]:
@@ -113,17 +112,14 @@ class ServerUI():
                         self.udpSerSock.sendto(temp,self.addr)
                         #清空文件内容
                         fp.truncate(0)
-                        fp.close()
-                        #fp.open(unicode(s[1]+'.txt', "utf8"),'')
-                        #fp.write('')
-                        #fp.close()
+                        fp.close() 
                         #发送好友上线信息
                         if isOnline==0:
                             for each in self.usr_online:
                                 self.udpSerSock.sendto('0##'+s[1],each[1])
                             #添加到上线用户列表
                         self.usr_online.append([s[1],self.addr])
-                        mark=1
+                        mark=1                       
                         break
                 fobj.close()
                 if mark==0:
@@ -145,8 +141,8 @@ class ServerUI():
                 if toUsrIsOnline==0:
                     fp = open(unicode(s[2]+'.txt', "utf8"),'a')
                     fp.write(self.clientMsg)
-                    fp.close()
-
+                    fp.close()    
+                    
                 theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 self.chatText.insert(Tkinter.END, theTime +' 客户端 ' +s[1] +' 对 客户端 ' + s[2] +' 说：\n')
                 self.chatText.insert(Tkinter.END, '  ' + s[3]+str(each[1]))
@@ -161,13 +157,15 @@ class ServerUI():
     def sendMessage(self):
         usrIsOnline=0
         #得到用户在Text中输入的消息
+        
         message = self.inputText.get('1.0',Tkinter.END)
         s=message.split('##')
+        
         #格式化当前的时间
         theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         for each in self.usr_online:
             if s[0]==each[0]:
-                self.udpSerSock.sendto('2##服务器##'+s[1],each[1])
+                self.udpSerSock.sendto('2##服务器##'+s[0]+'##'+s[1],each[1])
                 usrIsOnline=1
                 self.chatText.insert(Tkinter.END, '服务器 ' + theTime +' 对 '+s[0]+' 说：\n')
                 self.chatText.insert(Tkinter.END,'  ' + s[1] + '\n')
@@ -177,23 +175,21 @@ class ServerUI():
 
         #清空用户在Text中输入的消息
         self.inputText.delete(0.0,message.__len__()-1.0)
-
+    
     #关闭消息窗口并退出
     def close(self):
         sys.exit()
-
+    
     #启动线程接收客户端的消息
     def startNewThread(self):
-        #启动一个新线程来接收客户端的消息
-        #thread.start_new_thread(function,args[,kwargs])函数原型，
-        #其中function参数是将要调用的线程函数，args是传递给线程函数的参数，它必须是个元组类型，而kwargs是可选的参数
-        #receiveMessage函数不需要参数，就传一个空元组
         thread.start_new_thread(self.receiveMessage,())
-
+    
 def main():
-    server = ServerUI()
+    server = ServerMessage('服务端')
+    server.setLocalANDPort('192.168.1.105',8808)
     server.startNewThread()
     server.root.mainloop()
-
+    
+    
 if __name__=='__main__':
     main()
