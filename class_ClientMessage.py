@@ -68,6 +68,10 @@ class ClientMessage():
                     i=i-1
                     self.chatText.delete(Tkinter.END)
                 os._exit(0)
+           #好友列表
+           elif s[0]=='F':
+                for eachFriend in s[1:len(s)]:
+                    print eachFriend
             #好友上线
             elif s[0]=='0':
                 theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -93,7 +97,17 @@ class ClientMessage():
                 except ftplib.error_perm:
                     print 'ERROR:cannot read file "%s"' %file
                 self.chatText.insert(Tkinter.END,filename[:-1]+' 传输完成')
-
+            elif s[0]=='4':
+                agreement=raw_input(s[1]+'请求加你为好友，验证消息:'+s[3]+'你愿意加'+s[1]+'为好友吗(Y/N)')
+                if agreement=='Y':
+                    self.udpCliSock.sendto('5##'+s[1]+'##'+s[2]+'##Y',self.ADDR)
+                elif agreement=='N':
+                    self.udpCliSock.sendto('5##'+s[1]+'##'+s[2]+'##N',self.ADDR)
+            elif s[0]=='5':
+                if s[3]=='Y':
+                    print s[2]+'接受了你的好友请求'
+                elif s[3]=='N':
+                    print s[2]+'拒绝了你的好友请求'
     #发送消息
     def sendMessage(self):
         #得到用户在Text中输入的消息
@@ -125,6 +139,12 @@ class ClientMessage():
         except ftplib.error_perm:
             print 'ERROR:cannot read file "%s"' %file
         self.udpCliSock.sendto('3##'+self.usr+'##'+self.toUsr+'##'+filename,self.ADDR);
+
+    #加好友
+    def addFriends(self):
+        message= self.inputText.get('1.0',Tkinter.END)
+        s=message.split('##')
+        self.udpCliSock.sendto('4##'+self.usr+'##'+s[0]+'##'+s[1],self.ADDR);
 
     #关闭消息窗口并退出
     def close(self):
