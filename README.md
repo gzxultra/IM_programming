@@ -68,3 +68,18 @@
 ![新闻栏目][13]
 
 这个功能采用第三方的feedparser模块，他采用http请求的方式以rss的形式将中新网的html下载下来并保存在元组中，然后我分别将title，description和link等关键字解包出来，显示在窗体上。
+
+
+
+  [2]: http://i1.tietuku.com/2251b6b7735c9e76.png
+  [3]: http://i1.tietuku.com/3fdc3d6424b1c624.png
+  [4]: http://i1.tietuku.com/a9f3bad070c39be7.png
+  [5]: http://i1.tietuku.com/396bf06e0a89595f.png
+  [6]: http://i1.tietuku.com/fbaea48bd2ff56ba.png
+  [7]: http://i1.tietuku.com/9f585f9ea4eeda1a.png
+  [8]: http://i1.tietuku.com/b99896716f9d9d70.png
+  [9]: http://i1.tietuku.com/2fd8cb49d29249d0.png
+  [10]: http://i1.tietuku.com/d461ee12df627d67.png
+  [11]: http://i1.tietuku.com/b99896716f9d9d70.png
+  [12]: http://i1.tietuku.com/65074a479fe6edbe.png
+  [13]: http://i1.tietuku.com/bd19d65e47bec8d6.png
